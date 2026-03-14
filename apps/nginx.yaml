@@ -4,7 +4,7 @@ metadata:
   name: nginx-test
   namespace: nginx-ns
   labels:
-    approved_exception: true
+    approved_exception: "true"
 spec:
   replicas: 1
   selector:
