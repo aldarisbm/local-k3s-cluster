@@ -38,13 +38,10 @@ data:
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/conditions"'
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/metrics"'
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/current-metrics"'
-  # Keep ignoreResourceUpdates so cluster-managed EndpointSlices don't cause drift noise,
-  # but EndpointSlice is removed from resource.exclusions so ArgoCD will manage the ones we define.
-  resource.customizations.ignoreResourceUpdates.discovery.k8s.io_EndpointSlice: |
-    jsonPointers:
-      - /metadata
-      - /endpoints
-      - /ports
+  # Ignore conditions field added automatically by Kubernetes to EndpointSlices
+  resource.customizations.ignoreDifferences.discovery.k8s.io_EndpointSlice: |
+    jqPathExpressions:
+      - '.endpoints[].conditions'
   resource.exclusions: |
     ### Network resources created by the Kubernetes control plane
     - apiGroups:
