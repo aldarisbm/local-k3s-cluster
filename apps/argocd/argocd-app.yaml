@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:aldarisbm/local-k3s-cluster.git
+    repoURL: https://github.com/aldarisbm/local-k3s-cluster.git
     targetRevision: HEAD
     path: apps/argocd
   destination:
