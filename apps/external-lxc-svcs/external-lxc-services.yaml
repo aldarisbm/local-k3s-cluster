@@ -151,3 +151,54 @@ spec:
                 name: downloader
                 port:
                   number: 8080
+---
+# ─── Proxmox (10.0.0.50:8006) ────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox
+  namespace: external-services
+spec:
+  ports:
+    - name: https
+      port: 8006
+      targetPort: 8006
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: proxmox
+  namespace: external-services
+  labels:
+    kubernetes.io/service-name: proxmox
+addressType: IPv4
+ports:
+  - name: https
+    protocol: TCP
+    port: 8006
+endpoints:
+  - addresses:
+      - 10.0.0.50
+    conditions: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proxmox
+  namespace: external-services
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: insecure@internal
+spec:
+  rules:
+    - host: prox.joseberr.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: proxmox
+                port:
+                  number: 8006
