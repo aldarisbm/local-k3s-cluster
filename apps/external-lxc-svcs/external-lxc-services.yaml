@@ -196,7 +196,8 @@ metadata:
   namespace: external-services
 spec:
   entryPoints:
-    - web
+    - websecure
+  tls: {}
   routes:
     - match: Host(`prox.joseberr.io`)
       kind: Rule
