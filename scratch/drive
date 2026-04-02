@@ -1,0 +1,6 @@
+UUID=69B8-46C6 /mnt/knightrider exfat defaults,nofail,uid=1000,gid=1000,umask=000 0 0
+
+
+/dev/sdb1: UUID="6c6c6b11-9e23-428f-bae3-4ffa8a6523e5" BLOCK_SIZE="4096" TYPE="ext4" PARTLABEL="primary" PARTUUID="ea710fc3-bdd6-4dfc-9148-b4bffe2ecafd"
+
+

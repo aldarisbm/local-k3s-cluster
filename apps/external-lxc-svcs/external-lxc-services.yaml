@@ -152,6 +152,153 @@ spec:
                 port:
                   number: 8080
 ---
+# ─── Sonarr (10.0.0.52:8989) ─────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarr
+  namespace: external-services
+spec:
+  ports:
+    - name: http
+      port: 8989
+      targetPort: 8989
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: sonarr
+  namespace: external-services
+  labels:
+    kubernetes.io/service-name: sonarr
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 8989
+endpoints:
+  - addresses:
+      - 10.0.0.52
+    conditions: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sonarr
+  namespace: external-services
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: sonarr.joseberr.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sonarr
+                port:
+                  number: 8989
+---
+# ─── Radarr (10.0.0.52:7878) ─────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: radarr
+  namespace: external-services
+spec:
+  ports:
+    - name: http
+      port: 7878
+      targetPort: 7878
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: radarr
+  namespace: external-services
+  labels:
+    kubernetes.io/service-name: radarr
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 7878
+endpoints:
+  - addresses:
+      - 10.0.0.52
+    conditions: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: radarr
+  namespace: external-services
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: radarr.joseberr.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: radarr
+                port:
+                  number: 7878
+---
+# ─── Prowlarr (10.0.0.52:9696) ───────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: prowlarr
+  namespace: external-services
+spec:
+  ports:
+    - name: http
+      port: 9696
+      targetPort: 9696
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: prowlarr
+  namespace: external-services
+  labels:
+    kubernetes.io/service-name: prowlarr
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 9696
+endpoints:
+  - addresses:
+      - 10.0.0.52
+    conditions: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prowlarr
+  namespace: external-services
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: prowlarr.joseberr.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prowlarr
+                port:
+                  number: 9696
+---
 # ─── Proxmox (10.0.0.50:8006) ────────────────────────────────────────────────
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
