@@ -23,6 +23,9 @@ For each LXC, there are three resources:
 |---|---|---|---|
 | plex.joseberr.io | 10.0.0.51 | 32400 | HTTP |
 | downloader.joseberr.io | 10.0.0.52 | 8080 | HTTP |
+| sonarr.joseberr.io | 10.0.0.52 | 8989 | HTTP |
+| radarr.joseberr.io | 10.0.0.52 | 7878 | HTTP |
+| prowlarr.joseberr.io | 10.0.0.52 | 9696 | HTTP |
 | jelly.joseberr.io | 10.0.0.53 | 8096 | HTTP |
 | prox.joseberr.io | 10.0.0.50 | 8006 | HTTPS (self-signed) |
 
