@@ -1,0 +1,124 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: vpn
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - FIREWALL_INPUT_PORTS=8080,7878,8989,9696 # Open ports for the whole stack
+      - VPN_SERVICE_PROVIDER=private internet access
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${OVPN_USER}
+      - OPENVPN_PASSWORD=${OVPN_PASSWORD}
+      - SERVER_REGIONS=CA Toronto
+      - VPN_PORT_FORWARDING=on
+      - VPN_PORT_FORWARDING_STATUS_FILE=/tmp/gluetun/forwarded_port
+      - TZ=America/New_York
+      - FIREWALL_OUTBOUND_SUBNETS=10.0.0.0/24,172.16.0.0/12
+    volumes:
+      - gluetun_data:/tmp/gluetun
+      - ./gluetun_config:/gluetun # Recommended to persist vpn config
+    ports:
+      - 8080:8080 # qBittorrent
+      - 7878:7878 # Radarr
+      - 8989:8989 # Sonarr
+      - 9696:9696 # Prowlarr
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "container:vpn" # Uses VPN network
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=8080
+    volumes:
+      - ./qbit_config:/config
+      - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
+    restart: always
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    network_mode: "container:vpn" # Optional: Keeps search traffic on VPN
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./prowlarr_config:/config
+    restart: always
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: "container:vpn"
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./radarr_config:/config
+      - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
+    restart: always
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "container:vpn"
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./sonarr_config:/config
+      - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
+    restart: always
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    network_mode: "container:vpn" # Keep it on the VPN so the cookie matches the IP
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - TZ=America/New_York
+    restart: unless-stopped
+
+  port-manager:
+    image: snoringdragon/gluetun-qbittorrent-port-manager:latest
+    container_name: port-manager
+    network_mode: "container:vpn"
+    restart: always
+    environment:
+      - QBITTORRENT_SERVER=localhost
+      - QBITTORRENT_PORT=8080
+      - PORT_FORWARDED=/tmp/gluetun/forwarded_port
+    volumes:
+      - gluetun_data:/tmp/gluetun:ro
+    depends_on:
+      gluetun:
+        condition: service_healthy
+      qbittorrent:
+        condition: service_started
+
+volumes:
+  gluetun_data:
