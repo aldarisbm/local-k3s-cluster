@@ -45,6 +45,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+        restart: true
     environment:
       - PUID=1000
       - PGID=1000
@@ -70,6 +71,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+        restart: true
     environment:
       - PUID=1000
       - PGID=1000
@@ -93,6 +95,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+        restart: true
     environment:
       - PUID=1000
       - PGID=1000
@@ -117,6 +120,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+        restart: true
     environment:
       - PUID=1000
       - PGID=1000
@@ -141,6 +145,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+        restart: true
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - TZ=America/New_York
@@ -168,6 +173,7 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
+        restart: true
       qbittorrent:
         condition: service_started
   autoheal:
