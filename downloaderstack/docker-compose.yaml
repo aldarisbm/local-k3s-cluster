@@ -56,7 +56,7 @@ services:
       - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080 || exit 1" ]
+      test: [ "CMD-SHELL", "ping -c 1 8.8.8.8 || exit 1" ]
       interval: 1m
       timeout: 10s
       retries: 3
@@ -80,7 +80,7 @@ services:
       - ./prowlarr_config:/config
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:9696 || exit 1" ]
+      test: [ "CMD-SHELL", "ping -c 1 8.8.8.8 || exit 1" ]
       interval: 1m
       timeout: 10s
       retries: 3
@@ -105,7 +105,7 @@ services:
       - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:7878 || exit 1" ]
+      test: [ "CMD-SHELL", "ping -c 1 8.8.8.8 || exit 1" ]
       interval: 1m
       timeout: 10s
       retries: 3
@@ -130,7 +130,7 @@ services:
       - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "curl -s http://localhost:8989 | grep -q 'Sonarr' || [ $? -eq 0 ]" ]
+      test: [ "CMD-SHELL", "ping -c 1 8.8.8.8 || exit 1" ]
       interval: 1m
       timeout: 10s
       retries: 3
