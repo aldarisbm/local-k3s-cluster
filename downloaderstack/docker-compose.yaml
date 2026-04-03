@@ -160,6 +160,8 @@ services:
     environment:
       - QBITTORRENT_SERVER=localhost
       - QBITTORRENT_PORT=8080
+      - QBITTORRENT_USER=${QBIT_USER}
+      - QBITTORRENT_PASS=${QBIT_PASSWORD}
       - PORT_FORWARDED=/tmp/gluetun/forwarded_port
     volumes:
       - gluetun_data:/tmp/gluetun:ro
