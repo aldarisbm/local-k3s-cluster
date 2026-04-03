@@ -26,6 +26,13 @@ services:
       - 7878:7878 # Radarr
       - 8989:8989 # Sonarr
       - 9696:9696 # Prowlarr
+    healthcheck:
+      # Switch to a simple ping—it's more reliable for "is the internet alive?"
+      test: [ "CMD-SHELL", "ping -c 1 8.8.8.8 || exit 1" ]
+      interval: 30s        # Check every 30s instead of 10s
+      timeout: 10s
+      retries: 5           # Give it more chances before calling it "dead"
+      start_period: 60s    # Wait 1 minute before starting checks (covers MTU discovery)
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
