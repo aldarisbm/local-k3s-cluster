@@ -2,6 +2,8 @@ services:
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: vpn
+    labels:
+      - autoheal=true
     restart: always
     cap_add:
       - NET_ADMIN
@@ -29,14 +31,16 @@ services:
     healthcheck:
       # Switch to a simple ping—it's more reliable for "is the internet alive?"
       test: [ "CMD-SHELL", "ping -c 1 8.8.8.8 || exit 1" ]
-      interval: 30s        # Check every 30s instead of 10s
+      interval: 45s        # Check every 30s instead of 10s
       timeout: 10s
-      retries: 5           # Give it more chances before calling it "dead"
-      start_period: 60s    # Wait 1 minute before starting checks (covers MTU discovery)
+      retries: 3           # Give it more chances before calling it "dead"
+      start_period: 90s    # Wait 1 minute before starting checks (covers MTU discovery)
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    labels:
+      - autoheal=true
     network_mode: "container:vpn" # Uses VPN network
     depends_on:
       gluetun:
@@ -50,10 +54,18 @@ services:
       - ./qbit_config:/config
       - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
     restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080 || exit 1" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
+    labels:
+      - autoheal=true
     network_mode: "container:vpn" # Optional: Keeps search traffic on VPN
     depends_on:
       gluetun:
@@ -65,10 +77,18 @@ services:
     volumes:
       - ./prowlarr_config:/config
     restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9696 || exit 1" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    labels:
+      - autoheal=true
     network_mode: "container:vpn"
     depends_on:
       gluetun:
@@ -81,10 +101,18 @@ services:
       - ./radarr_config:/config
       - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
     restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:7878 || exit 1" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    labels:
+      - autoheal=true
     network_mode: "container:vpn"
     depends_on:
       gluetun:
@@ -97,10 +125,18 @@ services:
       - ./sonarr_config:/config
       - /mnt/knightrider/data:/data # <--- THE HARDLINK KEY
     restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:8989 | grep -q 'Sonarr' || [ $? -eq 0 ]" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
+    labels:
+      - autoheal=true
     network_mode: "container:vpn" # Keep it on the VPN so the cookie matches the IP
     depends_on:
       gluetun:
@@ -109,6 +145,12 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - TZ=America/New_York
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8191 || exit 1" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   port-manager:
     image: snoringdragon/gluetun-qbittorrent-port-manager:latest
@@ -126,6 +168,16 @@ services:
         condition: service_healthy
       qbittorrent:
         condition: service_started
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: always
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all # Tells it to watch everything with a healthcheck
+      - AUTOHEAL_INTERVAL=60         # Check every 60 seconds
+      - AUTOHEAL_START_PERIOD=300    # Wait 5 mins after boot before starting to "kill" things
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   gluetun_data:
