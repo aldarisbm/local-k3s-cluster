@@ -13,18 +13,6 @@ stringData:
   APP_USER: "appuser"
   APP_USER_PASSWORD: "apppassword123"
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: oracle-db-pvc
-  namespace: oracle-db
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -64,9 +52,6 @@ spec:
                 secretKeyRef:
                   name: oracle-db-secret
                   key: APP_USER_PASSWORD
-          volumeMounts:
-            - name: oracle-data
-              mountPath: /opt/oracle/oradata
           readinessProbe:
             exec:
               command:
@@ -76,10 +61,6 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 15
             failureThreshold: 10
-      volumes:
-        - name: oracle-data
-          persistentVolumeClaim:
-            claimName: oracle-db-pvc
 ---
 apiVersion: v1
 kind: Service
