@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-lxc-services
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/aldarisbm/local-k3s-cluster
+    targetRevision: HEAD
+    path: apps/external-lxc-svcs
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      enabled: true
+      selfHeal: true
