@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oracle-db-secret
+  namespace: oracle-db
+type: Opaque
+stringData:
+  # Password for the built-in SYS and SYSTEM accounts.
+  # ORACLE_PASSWORD is required; change this before deploying.
+  ORACLE_PASSWORD: "dummypassword123"
+  # Optional: creates an extra app-level user (APPUSER/APPUSER_PASSWORD).
+  # Remove these two lines if you don't need a separate app user.
+  APP_USER: "appuser"
+  APP_USER_PASSWORD: "apppassword123"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: oracle-db-pvc
+  namespace: oracle-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oracle-db
+  namespace: oracle-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle-db
+  template:
+    metadata:
+      labels:
+        app: oracle-db
+    spec:
+      containers:
+        - name: oracle-db
+          image: gvenzl/oracle-xe:21-slim-faststart
+          ports:
+            - containerPort: 1521
+              name: oracle
+          env:
+            - name: ORACLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-db-secret
+                  key: ORACLE_PASSWORD
+            - name: APP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-db-secret
+                  key: APP_USER
+            - name: APP_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-db-secret
+                  key: APP_USER_PASSWORD
+          volumeMounts:
+            - name: oracle-data
+              mountPath: /opt/oracle/oradata
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - healthcheck.sh
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 10
+      volumes:
+        - name: oracle-data
+          persistentVolumeClaim:
+            claimName: oracle-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oracle-db
+  namespace: oracle-db
+spec:
+  selector:
+    app: oracle-db
+  ports:
+    - name: oracle
+      port: 1337
+      targetPort: 1521
+  type: ClusterIP
