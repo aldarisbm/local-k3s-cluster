@@ -5,13 +5,87 @@ metadata:
   namespace: oracle-db
 type: Opaque
 stringData:
-  # Password for the built-in SYS and SYSTEM accounts.
-  # ORACLE_PASSWORD is required; change this before deploying.
   ORACLE_PASSWORD: "dummypassword123"
-  # Optional: creates an extra app-level user (APPUSER/APPUSER_PASSWORD).
-  # Remove these two lines if you don't need a separate app user.
   APP_USER: "appuser"
   APP_USER_PASSWORD: "apppassword123"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oracle-seed
+  namespace: oracle-db
+data:
+  seed.sh: |
+    #!/bin/sh
+    echo "Waiting for Oracle DB to be ready..."
+    until sqlplus -s appuser/apppassword123@//localhost:1521/XEPDB1 <<< "SELECT 1 FROM DUAL;" 2>&1 | grep -q "1 FROM DUAL\|         1"; do
+      echo "  DB not ready yet, retrying in 15s..."
+      sleep 15
+    done
+    echo "DB is up. Seeding demo data..."
+
+    sqlplus -s appuser/apppassword123@//localhost:1521/XEPDB1 << 'SQLEOF'
+    -- Drop if exists (idempotent reseeds on pod restart since no PVC)
+    BEGIN
+      EXECUTE IMMEDIATE 'DROP TABLE demo_users';
+    EXCEPTION
+      WHEN OTHERS THEN NULL;
+    END;
+    /
+
+    CREATE TABLE demo_users (
+      id             NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      full_name      VARCHAR2(100),
+      email          VARCHAR2(150),
+      phone          VARCHAR2(20),
+      address        VARCHAR2(250),
+      city           VARCHAR2(100),
+      state          VARCHAR2(50),
+      zip            VARCHAR2(10),
+      ssn            VARCHAR2(11),
+      credit_card    VARCHAR2(19),
+      cc_exp         VARCHAR2(7),
+      cc_cvv         VARCHAR2(4),
+      date_of_birth  DATE
+    );
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('James R. Holloway', 'james.holloway@example.com', '555-302-4891', '4821 Elm Street', 'Austin', 'TX', '78701', '523-74-9012', '4532 1234 5678 9010', '09/27', '482', TO_DATE('1985-03-14', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Maria L. Chen', 'maria.chen@example.com', '555-748-2310', '172 Oak Avenue Apt 3B', 'Seattle', 'WA', '98101', '301-58-7623', '5425 2334 3010 9191', '03/26', '731', TO_DATE('1990-07-22', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Darnell T. Washington', 'dwashington@example.com', '555-913-0047', '889 Maple Drive', 'Chicago', 'IL', '60601', '412-93-1847', '3714 496353 98431', '11/28', '093', TO_DATE('1978-11-05', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Sofia A. Ramirez', 'sofia.ramirez@example.com', '555-670-3322', '3300 Pine Boulevard', 'Miami', 'FL', '33101', '289-44-6710', '4916 3383 0408 1234', '06/25', '218', TO_DATE('1995-01-30', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Brian K. O''Sullivan', 'bkosullivan@example.com', '555-204-7761', '55 Willow Lane', 'Boston', 'MA', '02101', '674-21-3398', '5100 0800 0000 1234', '02/29', '904', TO_DATE('1982-09-17', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Aisha N. Patel', 'aisha.patel@example.com', '555-537-8892', '710 Cedar Court Unit 12', 'Denver', 'CO', '80201', '548-76-0034', '4024 0071 2345 6789', '08/27', '356', TO_DATE('1993-05-08', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Robert J. Nguyen', 'rjnguyen@example.com', '555-389-4410', '2201 Birch Street', 'Portland', 'OR', '97201', '739-85-2241', '4111 1111 1111 1111', '12/26', '737', TO_DATE('1975-12-03', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Keisha M. Johnson', 'keisha.johnson@example.com', '555-821-6630', '45 Spruce Way', 'Atlanta', 'GA', '30301', '195-62-8833', '5425 2334 3010 4321', '04/28', '519', TO_DATE('1988-06-19', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Tyler W. Brooks', 'tyler.brooks@example.com', '555-476-9012', '8810 Aspen Circle', 'Phoenix', 'AZ', '85001', '463-11-5920', '6011 1111 1111 1117', '07/25', '842', TO_DATE('2000-02-14', 'YYYY-MM-DD'));
+
+    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
+    VALUES ('Priya S. Mehta', 'priya.mehta@example.com', '555-143-7753', '319 Redwood Road', 'San Jose', 'CA', '95101', '827-39-4401', '4532 9871 2345 0099', '01/30', '267', TO_DATE('1997-08-25', 'YYYY-MM-DD'));
+
+    COMMIT;
+
+    SELECT COUNT(*) || ' rows seeded into demo_users.' FROM demo_users;
+    SQLEOF
+
+    echo "Seeding complete. Sleeping to keep sidecar alive."
+    exec sleep infinity
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -32,40 +106,9 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
-      initContainers:
-        - name: oracle-cleanup
-          image: busybox
-          command:
-            - sh
-            - -c
-            - |
-              find /opt/oracle/oradata -name "lk*" -delete 2>/dev/null
-              find /opt/oracle/oradata -name "*.lck" -delete 2>/dev/null
-              rm -f /opt/oracle/oradata/.oracle_lock 2>/dev/null
-              echo "lock cleanup done"
-          volumeMounts:
-            - name: oracle-data
-              mountPath: /opt/oracle/oradata
       containers:
         - name: oracle-db
-          image: gvenzl/oracle-xe:21-slim
-          command:
-            - /bin/sh
-            - -c
-            - |
-              # Clean stale Oracle SGA/semaphores from previous crash in same pod IPC namespace
-              ipcs -m 2>/dev/null | awk 'NR>3 {print $2}' | while read id; do ipcrm -m "$id" 2>/dev/null; done
-              ipcs -s 2>/dev/null | awk 'NR>3 {print $2}' | while read id; do ipcrm -s "$id" 2>/dev/null; done
-              exec /opt/oracle/container-entrypoint.sh
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                  - /bin/sh
-                  - -c
-                  - |
-                    echo "shutdown immediate;" | sqlplus -s / as sysdba
-                    lsnrctl stop
+          image: gvenzl/oracle-xe:21-slim-faststart
           ports:
             - containerPort: 1521
               name: oracle
@@ -94,25 +137,26 @@ spec:
                 - /bin/sh
                 - -c
                 - healthcheck.sh
-            initialDelaySeconds: 120
-            periodSeconds: 30
-            failureThreshold: 20
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 10
+
+        - name: db-seeder
+          image: gvenzl/oracle-xe:21-slim-faststart
+          command:
+            - /bin/sh
+            - /scripts/seed.sh
+          volumeMounts:
+            - name: seed-scripts
+              mountPath: /scripts
+
       volumes:
         - name: oracle-data
-          persistentVolumeClaim:
-            claimName: oracle-db-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: oracle-db-pvc
-  namespace: oracle-db
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
+          emptyDir: {}
+        - name: seed-scripts
+          configMap:
+            name: oracle-seed
+            defaultMode: 0755
 ---
 apiVersion: v1
 kind: Service
