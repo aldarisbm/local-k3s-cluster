@@ -18,7 +18,7 @@ data:
   seed.sh: |
     #!/bin/sh
     echo "Waiting for Oracle DB to be ready..."
-    until echo "SELECT 1 FROM DUAL;" | sqlplus -s appuser/apppassword123@//localhost:1521/XEPDB1 2>&1 | grep -q "^         1"; do
+    until echo "SELECT 1 FROM DUAL;" | sqlplus -s appuser/apppassword123@//localhost:1521/XEPDB1 2>&1 | grep -q "^[[:space:]]*1$"; do
       echo "  DB not ready yet, retrying in 15s..."
       sleep 15
     done
