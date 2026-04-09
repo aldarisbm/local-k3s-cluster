@@ -25,7 +25,6 @@ data:
     echo "DB is up. Seeding demo data..."
 
     sqlplus -s appuser/apppassword123@//localhost:1521/XEPDB1 << 'SQLEOF'
-    -- Drop if exists (idempotent reseeds on pod restart since no PVC)
     BEGIN
       EXECUTE IMMEDIATE 'DROP TABLE demo_users';
     EXCEPTION
@@ -34,50 +33,103 @@ data:
     /
 
     CREATE TABLE demo_users (
-      id             NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-      full_name      VARCHAR2(100),
-      email          VARCHAR2(150),
-      phone          VARCHAR2(20),
-      address        VARCHAR2(250),
-      city           VARCHAR2(100),
-      state          VARCHAR2(50),
-      zip            VARCHAR2(10),
-      ssn            VARCHAR2(11),
-      credit_card    VARCHAR2(19),
-      cc_exp         VARCHAR2(7),
-      cc_cvv         VARCHAR2(4),
-      date_of_birth  DATE
+      id                   NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      full_name            VARCHAR2(100),
+      email                VARCHAR2(150),
+      phone                VARCHAR2(20),
+      address_line1        VARCHAR2(150),
+      address_line2        VARCHAR2(100),
+      city                 VARCHAR2(100),
+      state                VARCHAR2(50),
+      zip                  VARCHAR2(10),
+      country              VARCHAR2(50),
+      date_of_birth        DATE,
+      ssn                  VARCHAR2(11),
+      drivers_license      VARCHAR2(20),
+      passport_no          VARCHAR2(20),
+      credit_card          VARCHAR2(19),
+      cc_exp               VARCHAR2(7),
+      cc_cvv               VARCHAR2(4),
+      bank_account         VARCHAR2(20),
+      bank_routing         VARCHAR2(9),
+      employer             VARCHAR2(150),
+      job_title            VARCHAR2(100),
+      annual_salary        NUMBER(10,2),
+      ip_address           VARCHAR2(15),
+      mothers_maiden_name  VARCHAR2(100)
     );
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('James R. Holloway', 'james.holloway@example.com', '555-302-4891', '4821 Elm Street', 'Austin', 'TX', '78701', '523-74-9012', '4532 1234 5678 9010', '09/27', '482', TO_DATE('1985-03-14', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('James R. Holloway','james.holloway@example.com','555-302-4891','4821 Elm Street',NULL,'Austin','TX','78701','USA',TO_DATE('1985-03-14','YYYY-MM-DD'),'523-74-9012','TX8234561','P12938471','4532 1234 5678 9010','09/27','482','4729103847561','021000021','Holloway Consulting LLC','Senior Engineer',124000.00,'192.168.12.45','Callahan');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Maria L. Chen', 'maria.chen@example.com', '555-748-2310', '172 Oak Avenue Apt 3B', 'Seattle', 'WA', '98101', '301-58-7623', '5425 2334 3010 9191', '03/26', '731', TO_DATE('1990-07-22', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Maria L. Chen','maria.chen@example.com','555-748-2310','172 Oak Avenue','Apt 3B','Seattle','WA','98101','USA',TO_DATE('1990-07-22','YYYY-MM-DD'),'301-58-7623','WA9912034','P88712340','5425 2334 3010 9191','03/26','731','8831029471038','125000024','Pacific Rim Technologies','Product Manager',138500.00,'10.0.1.88','Tanaka');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Darnell T. Washington', 'dwashington@example.com', '555-913-0047', '889 Maple Drive', 'Chicago', 'IL', '60601', '412-93-1847', '3714 496353 98431', '11/28', '093', TO_DATE('1978-11-05', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Darnell T. Washington','dwashington@example.com','555-913-0047','889 Maple Drive',NULL,'Chicago','IL','60601','USA',TO_DATE('1978-11-05','YYYY-MM-DD'),'412-93-1847','IL4421987','P33401928','3714 496353 98431','11/28','093','1029384756201','071000013','Midwest Financial Group','VP of Operations',195000.00,'172.16.4.201','Simmons');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Sofia A. Ramirez', 'sofia.ramirez@example.com', '555-670-3322', '3300 Pine Boulevard', 'Miami', 'FL', '33101', '289-44-6710', '4916 3383 0408 1234', '06/25', '218', TO_DATE('1995-01-30', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Sofia A. Ramirez','sofia.ramirez@example.com','555-670-3322','3300 Pine Boulevard','Suite 410','Miami','FL','33101','USA',TO_DATE('1995-01-30','YYYY-MM-DD'),'289-44-6710','FL7731209','P55019283','4916 3383 0408 1234','06/25','218','5530192847463','067014822','SunCoast Media Inc','Marketing Director',112000.00,'10.10.0.57','Gutierrez');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Brian K. O''Sullivan', 'bkosullivan@example.com', '555-204-7761', '55 Willow Lane', 'Boston', 'MA', '02101', '674-21-3398', '5100 0800 0000 1234', '02/29', '904', TO_DATE('1982-09-17', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Brian K. O''Sullivan','bkosullivan@example.com','555-204-7761','55 Willow Lane',NULL,'Boston','MA','02101','USA',TO_DATE('1982-09-17','YYYY-MM-DD'),'674-21-3398','MA3319204','P71128394','5100 0800 0000 1234','02/29','904','7748301928475','011000138','BioNorth Research','Clinical Data Analyst',98500.00,'192.168.0.112','Brennan');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Aisha N. Patel', 'aisha.patel@example.com', '555-537-8892', '710 Cedar Court Unit 12', 'Denver', 'CO', '80201', '548-76-0034', '4024 0071 2345 6789', '08/27', '356', TO_DATE('1993-05-08', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Aisha N. Patel','aisha.patel@example.com','555-537-8892','710 Cedar Court','Unit 12','Denver','CO','80201','USA',TO_DATE('1993-05-08','YYYY-MM-DD'),'548-76-0034','CO8812745','P29837461','4024 0071 2345 6789','08/27','356','3392018473920','102000076','Rocky Mountain Health','Staff Physician',248000.00,'10.0.2.19','Kapoor');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Robert J. Nguyen', 'rjnguyen@example.com', '555-389-4410', '2201 Birch Street', 'Portland', 'OR', '97201', '739-85-2241', '4111 1111 1111 1111', '12/26', '737', TO_DATE('1975-12-03', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Robert J. Nguyen','rjnguyen@example.com','555-389-4410','2201 Birch Street',NULL,'Portland','OR','97201','USA',TO_DATE('1975-12-03','YYYY-MM-DD'),'739-85-2241','OR2210934','P40193827','4111 1111 1111 1111','12/26','737','9182736450192','323270742','Cascade Software','Principal Architect',182000.00,'172.31.8.9','Tran');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Keisha M. Johnson', 'keisha.johnson@example.com', '555-821-6630', '45 Spruce Way', 'Atlanta', 'GA', '30301', '195-62-8833', '5425 2334 3010 4321', '04/28', '519', TO_DATE('1988-06-19', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Keisha M. Johnson','keisha.johnson@example.com','555-821-6630','45 Spruce Way',NULL,'Atlanta','GA','30301','USA',TO_DATE('1988-06-19','YYYY-MM-DD'),'195-62-8833','GA5501923','P62019384','5425 2334 3010 4321','04/28','519','6610293847502','061000052','Southern Legal Partners','Attorney',167500.00,'192.168.3.77','Williams');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Tyler W. Brooks', 'tyler.brooks@example.com', '555-476-9012', '8810 Aspen Circle', 'Phoenix', 'AZ', '85001', '463-11-5920', '6011 1111 1111 1117', '07/25', '842', TO_DATE('2000-02-14', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Tyler W. Brooks','tyler.brooks@example.com','555-476-9012','8810 Aspen Circle','Apt 2','Phoenix','AZ','85001','USA',TO_DATE('2000-02-14','YYYY-MM-DD'),'463-11-5920','AZ1102934','P83920174','6011 1111 1111 1117','07/25','842','2291038475610','122105155','Desert Sun Logistics','Operations Coordinator',67000.00,'10.1.5.34','Harrison');
 
-    INSERT INTO demo_users (full_name, email, phone, address, city, state, zip, ssn, credit_card, cc_exp, cc_cvv, date_of_birth)
-    VALUES ('Priya S. Mehta', 'priya.mehta@example.com', '555-143-7753', '319 Redwood Road', 'San Jose', 'CA', '95101', '827-39-4401', '4532 9871 2345 0099', '01/30', '267', TO_DATE('1997-08-25', 'YYYY-MM-DD'));
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Priya S. Mehta','priya.mehta@example.com','555-143-7753','319 Redwood Road',NULL,'San Jose','CA','95101','USA',TO_DATE('1997-08-25','YYYY-MM-DD'),'827-39-4401','CA9923817','P19283741','4532 9871 2345 0099','01/30','267','4401928374651','121042882','Apex AI Solutions','Machine Learning Engineer',215000.00,'10.20.0.3','Sharma');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Marcus D. Ellis','m.ellis@example.com','555-667-3301','100 Lakeview Drive','Floor 3','Nashville','TN','37201','USA',TO_DATE('1983-04-11','YYYY-MM-DD'),'334-87-2210','TN6672019','P50192837','5399 9999 9999 9999','05/27','614','8830192746503','064000017','Music City Ventures','CFO',230000.00,'172.20.10.5','Patterson');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Linda F. Kowalski','linda.kowalski@example.com','555-229-8810','7 Greenfield Terrace',NULL,'Detroit','MI','48201','USA',TO_DATE('1971-12-28','YYYY-MM-DD'),'561-30-4492','MI3341872','P72918340','4716 1234 5678 9010','10/25','338','1102938475619','072000326','Great Lakes Manufacturing','Plant Manager',142000.00,'192.168.7.200','Nowak');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Carlos M. Vega','cvega@example.com','555-984-1120','2050 Sunset Blvd','Apt 901','Los Angeles','CA','90001','USA',TO_DATE('1991-09-03','YYYY-MM-DD'),'718-24-9903','CA4412839','P38291047','5425 1111 2222 3333','08/28','921','3301928476512','122237983','Vega Entertainment Group','Talent Agent',155000.00,'10.0.0.92','Morales');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Rachel T. Goldberg','r.goldberg@example.com','555-310-7742','88 Park Place','Unit 5C','New York','NY','10001','USA',TO_DATE('1986-06-15','YYYY-MM-DD'),'492-55-8821','NY8871034','P91837264','4929 1234 1234 1234','11/27','503','9910283746502','021000089','Goldman Sterns Advisory','Investment Analyst',310000.00,'10.100.1.14','Friedman');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Jerome A. Dupont','j.dupont@example.com','555-773-4490','532 Bourbon Street',NULL,'New Orleans','LA','70112','USA',TO_DATE('1979-02-20','YYYY-MM-DD'),'627-41-3318','LA2219034','P64738291','3782 822463 10005','03/26','117','5501938274650','065000090','Crescent City Hospitality','General Manager',118000.00,'172.16.0.48','Thibodaux');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Natalie J. Frost','natalie.frost@example.com','555-412-6603','14 Birchwood Close',NULL,'Minneapolis','MN','55401','USA',TO_DATE('1994-10-07','YYYY-MM-DD'),'385-66-0129','MN7710293','P27384019','4539 1488 0343 6467','09/28','274','7701029384752','091000022','North Star Analytics','Data Scientist',132000.00,'192.168.44.11','Larson');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Samuel O. Adeyemi','s.adeyemi@example.com','555-601-8823','3410 Independence Ave','Apt 7','Washington','DC','20001','USA',TO_DATE('1987-07-30','YYYY-MM-DD'),'714-29-5530','DC5541029','P83019274','5425 9876 5432 1098','01/29','847','4401029384756','054001204','Federal Policy Group','Senior Policy Advisor',178000.00,'10.0.50.99','Okafor');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Grace H. Kim','grace.kim@example.com','555-857-2230','991 Cherry Blossom Way',NULL,'San Francisco','CA','94101','USA',TO_DATE('1999-03-18','YYYY-MM-DD'),'253-80-4471','CA7723910','P10293847','4916 0387 9932 1045','12/28','439','6610293847512','121000358','Bay Area Biotech','Junior Researcher',88000.00,'10.20.1.50','Park');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Patrick M. Reilly','p.reilly@example.com','555-334-9980','67 Harbor View Road',NULL,'Baltimore','MD','21201','USA',TO_DATE('1976-08-22','YYYY-MM-DD'),'836-17-2249','MD4412093','P39182746','5100 1234 5678 9012','07/27','612','3319283740192','052000113','Chesapeake Infrastructure','Civil Engineer',145000.00,'172.22.8.3','O''Brien');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Yolanda B. Cruz','y.cruz@example.com','555-509-7741','205 Mesa Vista Court','Unit B','Albuquerque','NM','87101','USA',TO_DATE('1989-11-14','YYYY-MM-DD'),'491-33-8872','NM6612094','P57391820','4532 4532 4532 4532','06/26','751','8820391847562','107006035','Southwest Education Trust','School Principal',91000.00,'192.168.99.1','Herrera');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Ethan P. Novak','e.novak@example.com','555-728-3319','1 Innovation Drive','Suite 200','Raleigh','NC','27601','USA',TO_DATE('1992-05-25','YYYY-MM-DD'),'368-54-1193','NC9921034','P48291037','6011 0009 9013 9424','04/30','388','9920183746501','053000219','Triangle Tech Ventures','Startup Founder',320000.00,'10.5.0.201','Horowitz');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Fatima Z. Al-Hassan','f.alhassan@example.com','555-812-4430','550 Desert Palm Ave',NULL,'Las Vegas','NV','89101','USA',TO_DATE('1996-01-09','YYYY-MM-DD'),'574-22-6601','NV3312094','P61029384','4024 0071 9876 5432','02/28','293','1102938475602','122400724','Vegas Global Imports','Supply Chain Manager',109000.00,'10.9.1.77','Mansouri');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Henry C. Blackwood','h.blackwood@example.com','555-193-6612','7890 Rolling Hills Blvd','Apt 14D','Kansas City','MO','64101','USA',TO_DATE('1981-07-04','YYYY-MM-DD'),'619-48-3375','MO5541038','P73918204','5425 3333 4444 5555','10/29','816','4400192837465','101000187','Heartland Insurance Co','Actuarial Director',202000.00,'172.18.5.6','Montgomery');
+
+    INSERT INTO demo_users (full_name,email,phone,address_line1,address_line2,city,state,zip,country,date_of_birth,ssn,drivers_license,passport_no,credit_card,cc_exp,cc_cvv,bank_account,bank_routing,employer,job_title,annual_salary,ip_address,mothers_maiden_name)
+    VALUES ('Isabelle M. Fontaine','i.fontaine@example.com','555-461-2270','33 Magnolia Court',NULL,'Charleston','SC','29401','USA',TO_DATE('1973-09-30','YYYY-MM-DD'),'742-85-1190','SC8812093','P29013847','4716 9999 8888 7777','08/26','542','7710293847651','053207766','Palmetto Properties LLC','Real Estate Broker',134000.00,'192.168.10.50','Beaumont');
 
     COMMIT;
 
