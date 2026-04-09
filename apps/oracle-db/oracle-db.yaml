@@ -32,6 +32,16 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
+      initContainers:
+        - name: oracle-cleanup
+          image: busybox
+          command:
+            - sh
+            - -c
+            - rm -f /opt/oracle/oradata/XE/lkXE /opt/oracle/oradata/XE/*.lck /opt/oracle/oradata/.oracle_lock 2>/dev/null; echo "lock cleanup done"
+          volumeMounts:
+            - name: oracle-data
+              mountPath: /opt/oracle/oradata
       containers:
         - name: oracle-db
           image: gvenzl/oracle-xe:21-slim-faststart
