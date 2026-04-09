@@ -38,7 +38,11 @@ spec:
           command:
             - sh
             - -c
-            - rm -f /opt/oracle/oradata/XE/lkXE /opt/oracle/oradata/XE/*.lck /opt/oracle/oradata/.oracle_lock 2>/dev/null; echo "lock cleanup done"
+            - |
+              find /opt/oracle/oradata -name "lk*" -delete 2>/dev/null
+              find /opt/oracle/oradata -name "*.lck" -delete 2>/dev/null
+              rm -f /opt/oracle/oradata/.oracle_lock 2>/dev/null
+              echo "lock cleanup done"
           volumeMounts:
             - name: oracle-data
               mountPath: /opt/oracle/oradata
