@@ -128,9 +128,6 @@ spec:
                 secretKeyRef:
                   name: oracle-db-secret
                   key: APP_USER_PASSWORD
-          volumeMounts:
-            - name: oracle-data
-              mountPath: /opt/oracle/oradata
           readinessProbe:
             exec:
               command:
@@ -151,8 +148,6 @@ spec:
               mountPath: /scripts
 
       volumes:
-        - name: oracle-data
-          emptyDir: {}
         - name: seed-scripts
           configMap:
             name: oracle-seed
